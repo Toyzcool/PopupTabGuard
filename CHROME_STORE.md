@@ -297,33 +297,39 @@ Follow Material Design, generous whitespace.
 **Capture strategy**
 No screenshots. Feed the prompt below directly to an image AI.
 
+> Note: the exact domain names are deliberately omitted from the tile and
+> kept to the privacy policy / permission justifications instead — reviewers
+> have full transparency there, and the public screenshot avoids printing
+> the site names in promotional imagery.
+
 **AI prompt**
 ```
 Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
 24-bit PNG (no alpha), pure white background.
 
 Top 80 pixels: bilingual header.
-Line 1 (Chinese, bold, ~36pt, #202124): "只在这些站点工作，其他一律不动"
-— highlight "只在这些站点" and "一律不动" in #1A73E8.
-Line 2 (English, medium, ~22pt, #5F6368): "Active on Listed Sites — Inactive Everywhere Else"
+Line 1 (Chinese, bold, ~36pt, #202124): "只在固定站点工作，其他一律不动"
+— highlight "固定站点" and "一律不动" in #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "Active on a Fixed List — Inactive Everywhere Else"
 — highlight "Active" and "Inactive" in #1A73E8.
 
 Main area: two columns separated by a vertical divider (#E8EAED, 1px),
 each column ~500px wide, vertically centered.
 
-Left column header (~20pt, #202124, bold): "生效域名 · Active hosts"
-Below it, a vertical stack of five pill rows (background #E8F0FE, text
-#1A73E8 medium 16pt, 10px radius, 12px vertical padding, 12px gap
-between rows, monospaced font for the domain text):
-- missav.com
-- missav.ws
-- missav.ai
-- missav.tv
-- missav123.com
+Left column (centered vertically, centered horizontally within its half):
+A very large numeral "5" in #1A73E8, bold, ~180pt, with a subtle
+gradient from #1A73E8 at top to #4FC3F7 at bottom.
+Directly under the numeral, a label in #202124 bold 22pt:
+"个固定的视频站点"
+Below that, an English label in #5F6368 medium 16pt:
+"hard-coded video hosts"
+Below that, a smaller hint in #9AA0A6 regular 13pt, italic:
+"完整名单见权限说明与隐私政策 / Full list in the permission notes and privacy policy"
+All three text lines centered.
 
 Right column header (~20pt, #202124, bold): "不做什么 · What it won't do"
 Below it, a vertical stack of four rows (each row: a small gray outline
-circle-with-slash icon + text, 12px gap between rows):
+circle-with-slash icon + text, 14px gap between rows):
 - 不读取页面文字 · Does not read page text
 - 不访问网络 · Makes no network requests
 - 不收集数据 · Collects no data
@@ -332,6 +338,7 @@ Text: #5F6368 medium 15pt. Icon: #9AA0A6, 18px.
 
 Bottom 40 pixels: extension icon + "Popup Tab Guard".
 Follow Material Design, airy layout, large whitespace.
+No site names, URLs, or host strings should appear anywhere on the tile.
 ```
 
 ### #4 — Open-source · Local-only · Zero uploads (trust tile)

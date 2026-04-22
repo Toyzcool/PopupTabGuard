@@ -197,15 +197,30 @@ When behavior changes, edit `PRIVACY.md` and bump the "Last updated" date.
 Chrome accepts up to 5 screenshots, 1280×800 or 640×400, 24-bit PNG/JPEG,
 no alpha. Always use 1280×800.
 
+> ⛔ **Hard rule: never screenshot missav or any covered host.** Any visible
+> thumbnail, logo, URL, or page content from those sites will trigger an
+> adult-content rejection. Every tile below is designed so no capture from
+> the target site is ever needed.
+
 Each tile: top header (bilingual), main visual, bottom signature strip
 ("Popup Tab Guard" + icon).
 
-### #1 — The problem, visualized (landing)
+### #1 — Landing: the popup storm (tab strip, neutralized)
 
-**Capture**
-1. Open a covered site, disable the extension, click the video player.
-2. Screenshot the browser tab strip showing the player tab plus 2–3 junk tabs that popped up.
-3. Same scenario with extension enabled — only the original tab remains.
+**Capture strategy**
+No missav needed. Two safe ways to stage the tab strip:
+
+- **Option A (preferred).** On any neutral page (e.g. `about:blank` or a
+  local HTML file), open DevTools → Elements → edit `<title>` on the fly,
+  or run `document.title = "Video Player"` in Console. Duplicate the tab
+  3–4 times and rename each: `"Sponsored"`, `"Ad · New"`, `"Special Offer"`.
+  Screenshot the full tab strip at the top of the Chrome window.
+- **Option B.** Screenshot your current Chrome tab strip, then in Figma /
+  Photoshop overwrite each tab's text with neutral placeholder labels
+  before exporting.
+
+Take two versions: one with 4 tabs (1 real + 3 "ads"), one with a single
+clean tab.
 
 **AI prompt**
 ```
@@ -218,29 +233,40 @@ Line 1 (Chinese, bold, ~36pt, #202124): "一键终结弹窗新标签页"
 Line 2 (English, medium, ~22pt, #5F6368): "One Toggle, No More Popup Tabs"
 — highlight "Popup Tabs" in #1A73E8.
 
-Main area (below the header): the two attached screenshots stacked
-vertically with 24px gap. Both depict a browser tab strip.
-- Top image (label "默认 · Default") — tab strip with one real tab and
-  three unrelated popup tabs beside it. Add a small red pill badge:
-  "Default" (background #FEE4E2, text #B42318, 6px radius).
-- Bottom image (label "Popup Tab Guard on") — only one clean tab.
-  Green pill: "Protected" (background #D1FADF, text #027A48).
+Main area: the two attached tab-strip captures stacked vertically with
+a 40px gap, horizontally centered, scaled to about 1100px wide.
 
-Round image corners to 12px, soft drop shadow.
+- Top image (the cluttered tab strip with 4 tabs — one player tab and
+  three unrelated ad-looking tabs). To its LEFT, outside the image,
+  place a red pill badge: "默认 · Default" (background #FEE4E2, text
+  #B42318, 6px radius, 14pt medium).
+- Bottom image (single clean tab). To its LEFT, a green pill:
+  "Popup Tab Guard · Protected" (background #D1FADF, text #027A48).
+
+Round image corners to 8px, soft drop shadow (0 6px 20px rgba(0,0,0,0.08)).
+
+Between the two images, centered, add a small downward arrow in #1A73E8
+(3px stroke, rounded caps) with the bilingual caption under it in
+#5F6368 13pt: "开启保护后 · After enabling".
 
 Bottom 40 pixels: thin horizontal line #E8EAED, centered extension icon
 and the text "Popup Tab Guard" in #202124 medium 14pt.
 
 Chinese font: PingFang SC / Source Han Sans.
 English font: Inter / SF Pro Display.
-Generous whitespace, Material Design feel.
+Generous whitespace, Material Design feel. No site names or URLs visible
+anywhere on either tab strip.
 ```
 
 ### #2 — The popup UI (Liquid Glass)
 
-**Capture**
-1. Click the toolbar icon so the extension popup opens.
-2. Screenshot the popup — switch ON state, then OFF state, on a light macOS background (Big Sur / Sonoma wallpaper).
+**Capture strategy**
+Completely safe — this is the extension's own UI.
+
+1. Click the toolbar icon so the popup opens.
+2. Screenshot the popup in ON state, then toggle and screenshot OFF state.
+3. Both captures on a neutral light desktop background (a light gray or
+   a soft macOS wallpaper without any app windows visible).
 
 **AI prompt**
 ```
@@ -254,11 +280,11 @@ Line 2 (English, medium, ~22pt, #5F6368): "Minimal Control, One Switch"
 — highlight "One Switch" in #1A73E8.
 
 Main area: two attached screenshots of the extension popup placed side
-by side with a 48px gap. Left: switch ON (green). Right: switch OFF
-(gray). Round corners 12px, large soft drop shadow to emphasize the
-glass material. Scale to fit the area with comfortable margins.
+by side with a 60px gap, vertically centered. Left: switch ON (green).
+Right: switch OFF (gray). Round corners 20px, large soft drop shadow
+(0 20px 60px rgba(28,28,45,0.18)) to emphasize the glass material.
 
-Under each screenshot, a small label in #5F6368 14pt:
+Under each screenshot, a small label centered in #5F6368 14pt:
 - Left: "保护开启 · Protection On"
 - Right: "临时关闭 · Paused"
 
@@ -266,12 +292,10 @@ Bottom 40 pixels: extension icon + "Popup Tab Guard" #202124 14pt.
 Follow Material Design, generous whitespace.
 ```
 
-### #3 — Scope transparency
+### #3 — Scope transparency (pure text composition — zero risk)
 
-**Capture**
-A list-style graphic showing the exact hosts the extension touches and
-the explicit "nothing else" guarantee. No real screenshot needed — text
-composition only.
+**Capture strategy**
+No screenshots. Feed the prompt below directly to an image AI.
 
 **AI prompt**
 ```
@@ -284,11 +308,13 @@ Line 1 (Chinese, bold, ~36pt, #202124): "只在这些站点工作，其他一律
 Line 2 (English, medium, ~22pt, #5F6368): "Active on Listed Sites — Inactive Everywhere Else"
 — highlight "Active" and "Inactive" in #1A73E8.
 
-Main area: two columns.
+Main area: two columns separated by a vertical divider (#E8EAED, 1px),
+each column ~500px wide, vertically centered.
 
 Left column header (~20pt, #202124, bold): "生效域名 · Active hosts"
 Below it, a vertical stack of five pill rows (background #E8F0FE, text
-#1A73E8 medium 16pt, 8px radius, 12px vertical padding):
+#1A73E8 medium 16pt, 10px radius, 12px vertical padding, 12px gap
+between rows, monospaced font for the domain text):
 - missav.com
 - missav.ws
 - missav.ai
@@ -296,18 +322,22 @@ Below it, a vertical stack of five pill rows (background #E8F0FE, text
 - missav123.com
 
 Right column header (~20pt, #202124, bold): "不做什么 · What it won't do"
-Below it, a vertical stack of bullet rows (grey checkmark icon + text
-#5F6368 medium 16pt):
+Below it, a vertical stack of four rows (each row: a small gray outline
+circle-with-slash icon + text, 12px gap between rows):
 - 不读取页面文字 · Does not read page text
 - 不访问网络 · Makes no network requests
 - 不收集数据 · Collects no data
 - 不在其他网站运行 · Inactive on all other sites
+Text: #5F6368 medium 15pt. Icon: #9AA0A6, 18px.
 
 Bottom 40 pixels: extension icon + "Popup Tab Guard".
 Follow Material Design, airy layout, large whitespace.
 ```
 
-### #4 — Open-source & local (trust tile)
+### #4 — Open-source · Local-only · Zero uploads (trust tile)
+
+**Capture strategy**
+No screenshots. Pure illustration.
 
 **AI prompt**
 ```
@@ -316,33 +346,83 @@ Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
 
 Top 80 pixels: bilingual header.
 Line 1 (Chinese, bold, ~36pt, #202124): "开源 · 纯本地 · 零上传"
-— highlight "开源", "纯本地", "零上传" in #1A73E8.
+— highlight "开源", "纯本地", "零上传" each in #1A73E8.
 Line 2 (English, medium, ~22pt, #5F6368): "Open Source · Local-Only · Zero Uploads"
-— highlight each of "Open Source", "Local-Only", "Zero Uploads" in #1A73E8.
+— highlight "Open Source", "Local-Only", "Zero Uploads" each in #1A73E8.
 
-Main area: three large square icon tiles in a horizontal row, each
-roughly 260×260px, rounded 24px, very soft drop shadow, subtle gradient
-background from #F8FAFF to #FFFFFF.
+Main area: three large rounded square tiles in a horizontal row, each
+roughly 280×280px, rounded 28px corners, very soft drop shadow
+(0 10px 30px rgba(26,115,232,0.10)), subtle gradient background from
+#F4F8FF at top-left to #FFFFFF at bottom-right, 1px inner border
+rgba(26,115,232,0.08). 40px gap between tiles.
 
-Tile 1 icon: a stylized code bracket "{ }" in #1A73E8.
-  Label below: "开源 Open Source — 代码在 GitHub 公开"
-Tile 2 icon: a simple house / folder icon in #1A73E8.
-  Label below: "纯本地 Local-Only — 设置只存在你的设备上"
-Tile 3 icon: a cloud with a slash through it, in #1A73E8.
-  Label below: "零上传 Zero Uploads — 无任何网络请求"
+Tile 1 — icon (centered upper area, ~100×100px): a stylized code-bracket
+glyph "{ }" in flat #1A73E8.
+  Chinese label: "开源"  (20pt #202124 bold)
+  English label: "Open Source"  (14pt #5F6368 medium)
+  Sub: "代码全部在 GitHub 公开" / "Full source on GitHub"  (12pt #9AA0A6)
 
-Labels: 15pt medium #202124 Chinese / #5F6368 English subtitle underneath.
+Tile 2 — icon: a simple outline home/house in #1A73E8.
+  Chinese label: "纯本地"
+  English label: "Local-Only"
+  Sub: "设置只存在你的设备" / "Settings stay on your device"
+
+Tile 3 — icon: an outline cloud with a diagonal slash through it in #1A73E8.
+  Chinese label: "零上传"
+  English label: "Zero Uploads"
+  Sub: "无任何网络请求" / "No network requests at all"
 
 Bottom 40 pixels: extension icon + "Popup Tab Guard".
-Material Design, ample whitespace.
+Material Design, ample whitespace, symmetric layout.
 ```
 
-### #5 — Optional: before/after player click (skip if hard to stage without showing site content)
+### #5 — How it works (abstract flow diagram)
 
-Skip unless you can get a capture that visibly conveys the popup storm
-without displaying any explicit site content. If shown, blur/block any
-thumbnail imagery from the source site — Chrome reviewers reject
-listings whose screenshots show adult content, even incidentally.
+**Capture strategy**
+No screenshots. Abstract vector illustration — feed the prompt to an
+image AI.
+
+**AI prompt**
+```
+Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
+24-bit PNG (no alpha), pure white background.
+
+Top 80 pixels: bilingual header.
+Line 1 (Chinese, bold, ~36pt, #202124): "点击一下 · 拦截中途的跳转"
+— highlight "拦截中途的跳转" in #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "One Click, Rogue Redirect Blocked Mid-Flight"
+— highlight "Blocked Mid-Flight" in #1A73E8.
+
+Main area: a horizontal three-stage flow, centered vertically, consisting
+of three rounded rectangle cards connected by arrows.
+
+Card 1 (left, ~280×220px, rounded 20px, light gray border #E8EAED,
+white fill): a minimal mouse-pointer / click-ripple illustration in
+#1A73E8 at center. Label below (inside card, 16pt bold #202124):
+"① 点击播放"  (sub: 14pt #5F6368 "Click the player")
+
+Arrow 1 (between card 1 and 2): #1A73E8, 3px, rounded caps, small
+arrowhead at the right end. Above the arrow, a tiny chip: "浏览器发起弹窗 /
+Browser tries to open popup" (11pt #9AA0A6 italic).
+
+Card 2 (middle, ~280×220px): a shield icon in #1A73E8 with a gentle
+glow halo behind it. Label (16pt bold #202124): "② 被拦截"  (sub: 14pt
+#5F6368 "Blocked by Guard"). A small green checkmark badge in the top-right
+corner.
+
+Arrow 2 (between card 2 and 3): same style as arrow 1. Above: tiny chip
+"新标签页被阻止 / New tab prevented" (11pt #9AA0A6 italic).
+
+Card 3 (right, ~280×220px): an illustration of a single clean browser
+window (just an outline with three window-dots) with a play-triangle
+inside. Label: "③ 安心留在当前页"  (sub: "Stay on the current page").
+
+Below the flow, a single-line footnote centered, 13pt #5F6368:
+"全程本地完成，不发送任何请求 · All processing is local, no network calls."
+
+Bottom 40 pixels: extension icon + "Popup Tab Guard".
+Material Design, clean strokes, generous whitespace.
+```
 
 ---
 

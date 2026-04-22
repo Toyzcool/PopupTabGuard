@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Popup Tab Guard</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="ambient">
+      <div class="blob blob-a"></div>
+      <div class="blob blob-b"></div>
+    </div>
+
+    <main class="glass-card" role="main">
+      <header class="card-header">
+        <div class="icon-badge">
+          <img src="../icons/icon48.png" alt="" />
+        </div>
+        <div class="titles">
+          <h1>Popup Tab Guard</h1>
+          <p id="status-line">Active on this site</p>
+        </div>
+      </header>
+
+      <section class="toggle-row">
+        <div class="toggle-label">
+          <span class="label-main">Protection</span>
+          <span class="label-sub" id="toggle-sub">Blocking popup tabs</span>
+        </div>
+        <label class="switch" aria-label="Toggle protection">
+          <input type="checkbox" id="enabled-toggle" checked />
+          <span class="slider"></span>
+        </label>
+      </section>
+
+      <footer class="card-footer">
+        <span class="footer-dot"></span>
+        <span id="footer-text">v1.1.0 · Guarding selected sites</span>
+      </footer>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

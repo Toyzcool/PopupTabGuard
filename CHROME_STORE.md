@@ -1,0 +1,459 @@
+# Chrome Web Store Release Playbook — Popup Tab Guard
+
+Single source of truth for publishing **Popup Tab Guard** to the Chrome Web
+Store. Every release, read top-to-bottom. When behavior changes, edit this
+doc first, then mirror into the Dashboard.
+
+> ⚠️ **Review risk note.** This extension's host permissions target a site
+> (`missav.*`) that Google may classify as adult-oriented. Chrome Web Store
+> *allows* adult-related utilities, but the listing will be scrutinized. Keep
+> all listing copy strictly **functional and neutral** — describe the
+> popup-blocking behavior, never describe or promote the target site's
+> content. Do **not** write "adult", "AV", "JAV", "porn", or the literal site
+> name anywhere in the public listing.
+
+---
+
+## 0. Release Checklist
+
+1. Bump `version` in `manifest.json` and `popup.html` footer (§1)
+2. Update §2 (Store listing copy) if behavior changed
+3. Update §3 (Permission justifications) if permissions changed
+4. Update §6 (Screenshots) if UI changed
+5. Update `PRIVACY.md` at repo root if data handling changed
+6. Run packaging command in §8
+7. Upload zip → fill listing from this doc → submit for review
+
+---
+
+## 1. Version Numbering
+
+| Change size | Example | Bump |
+|---|---|---|
+| New user-visible feature | Options page added | `1.1 → 1.2` |
+| Small UX change / fix | Toggle copy tweak | `1.1 → 1.1.1` |
+| Major refactor / breaking | New host list mechanism | `1.x → 2.0` |
+
+Store versions must strictly increase. Internal iterations can skip ahead but never go back.
+
+Current published: pending first submission at `1.1.0`.
+
+---
+
+## 2. Store Listing Copy
+
+### 2.1 Summary (≤132 characters, shown in search results)
+
+**English (default)**
+```
+Stops rogue popup tabs on certain video sites — clicks stay on the page you're watching, no surprise new tabs.
+```
+
+**中文 (zh_CN)**
+```
+拦截特定视频站点的弹窗新标签页：点击时停留在当前页面，不再冒出无关标签。
+```
+
+### 2.2 Detailed Description
+
+#### English
+```
+Popup Tab Guard — Stop rogue popup tabs from hijacking your clicks
+
+The problem
+On some video streaming websites, clicking the play button (or just about
+anywhere on the page) opens an unrelated new tab in the background. You
+came to watch a video; you end up with three unwanted tabs and a distracted
+browser.
+
+What this extension does
+Popup Tab Guard runs only on a small, fixed list of video websites where
+this problem occurs. On those sites — and only those sites — it:
+
+• Neutralizes programmatic popup calls from the page, so window.open no
+  longer produces new tabs.
+• Intercepts clicks on links whose only job is to open a third-party tab,
+  and cancels them before the browser acts on them.
+• As a fallback, when a new tab is spawned from a covered site and
+  immediately navigates to a third-party address, the new tab is closed.
+
+Your actual click — playing the video, following a real link within the
+site, opening the menu — is left completely alone.
+
+One-tap control
+Click the toolbar icon to open the popup. A single switch turns protection
+on or off. The choice is remembered locally. Default: on.
+
+Built to be minimal
+• No accounts. No sign-in. No cloud.
+• No analytics, no telemetry, no network requests of any kind.
+• The only data stored is a single on/off boolean on your own device.
+• Open source — inspect every line at the GitHub repo.
+
+Scope
+Active on a specific, hard-coded list of video sites where this popup
+behavior is common. The extension does nothing on any other website. If
+you want to propose additional sites, open an issue on the GitHub repo.
+```
+
+#### 中文
+```
+Popup Tab Guard — 让失控的弹窗新标签页消失
+
+痛点
+有些视频站点，点播放按钮（甚至随便点页面上任何位置）都会在后台打开一个无关的新标签页。你本来只想看视频，却得到一堆莫名其妙的新标签，浏览器越来越乱。
+
+这个插件做什么
+Popup Tab Guard 只在一小份固定的视频站点名单上运行。在这些站点——也仅限这些站点——它会：
+
+• 使页面发起的程序化弹窗调用失效（window.open 不再打开新标签页）。
+• 在浏览器动手之前，拦截那些只用于跳转第三方新标签的链接点击。
+• 作为兜底：如果来自受保护站点的新标签一打开就跳去第三方地址，新标签会被关闭。
+
+你真正想做的操作——播放视频、在站内跳转、打开菜单——完全不受影响。
+
+一键开关
+点击工具栏图标打开面板，一个开关即可启停。状态会本地保存。默认开启。
+
+极简设计
+• 无账户、无登录、无云端。
+• 无统计、无遥测、无任何网络请求。
+• 只在本地保存一个开关布尔值，其他什么都不存。
+• 开源，代码全部可在 GitHub 仓库查看。
+
+作用范围
+只在一份固定的视频站点名单上生效，其他任何网站完全不触发。希望新增站点可到 GitHub 仓库提 issue。
+```
+
+### 2.3 manifest.json `description` field
+Max 132 chars. Mirrors §2.1 summary:
+```
+Keeps playback in the current tab by blocking unwanted popup tabs that open when you click on certain video streaming sites.
+```
+
+---
+
+## 3. Permission Justifications
+
+### Single purpose statement
+```
+Popup Tab Guard is a single-purpose utility that prevents unwanted popup tabs from opening when the user clicks on a specific, hard-coded list of video streaming websites. The extension takes no action on any other site, collects no data, and makes no network requests.
+```
+
+### `storage`
+```
+Used to persist a single boolean flag on the user's own device (chrome.storage.local): whether protection is currently enabled. Nothing else is stored. Nothing is synced or uploaded.
+```
+
+### `tabs`
+```
+Used by the background service worker to read, for each newly opened tab, only its openerTabId and target URL (pendingUrl / url). This allows the extension to detect when a covered video site has spawned a new tab that immediately navigates to an unrelated third-party address — the signature of the popup we're blocking — and close that new tab. No browsing history, no metadata from unrelated tabs, and nothing from non-covered sites is read.
+```
+
+### Host permissions (`*://*.missav.com/*`, `*://*.missav.ws/*`, `*://*.missav.ai/*`, `*://*.missav.tv/*`, `*://*.missav123.com/*`)
+```
+Required to run the two content scripts on exactly the five hosts where the unwanted popup behavior occurs. One content script reads the single boolean enabled flag from chrome.storage and forwards it to the second script, which overrides window.open and cancels click/mousedown/auxclick events on <a target="_blank"> links pointing to third-party domains. The extension reads no page content, no form input, and no credentials. It injects no UI into the page.
+```
+
+### Remote code
+Answer: **No, I am not using remote code.**
+Rationale: all JavaScript ships inside the package. No `eval`, no external `<script src>`, no runtime-fetched modules, no remote configuration.
+
+---
+
+## 4. Data Usage Form
+
+Do **not** check any data collection box. Popup Tab Guard collects, transmits, and stores no user data other than a local boolean on/off flag that is not linked to any identifier.
+
+Confirm all three certifications:
+- ✅ I do not sell or transfer user data to third parties, outside of the approved use cases
+- ✅ I do not use or transfer user data for purposes that are unrelated to my item's single purpose
+- ✅ I do not use or transfer user data to determine creditworthiness or for lending purposes
+
+---
+
+## 5. Privacy Policy
+
+Policy lives at repo root: [`/PRIVACY.md`](./PRIVACY.md).
+Public URL for Dashboard (after first push to `main`):
+
+```
+https://raw.githubusercontent.com/Toyzcool/PopupTabGuard/main/PRIVACY.md
+```
+
+> Note: the GitHub repo is currently **private**. Chrome Web Store requires
+> a publicly accessible privacy policy URL. Options:
+> 1. Make the repo public before submitting (recommended — also earns
+>    reviewer trust for open-source utility extensions).
+> 2. Or paste the same content into a public Gist / static page and use
+>    that URL instead.
+
+When behavior changes, edit `PRIVACY.md` and bump the "Last updated" date.
+
+---
+
+## 6. Screenshots
+
+Chrome accepts up to 5 screenshots, 1280×800 or 640×400, 24-bit PNG/JPEG,
+no alpha. Always use 1280×800.
+
+Each tile: top header (bilingual), main visual, bottom signature strip
+("Popup Tab Guard" + icon).
+
+### #1 — The problem, visualized (landing)
+
+**Capture**
+1. Open a covered site, disable the extension, click the video player.
+2. Screenshot the browser tab strip showing the player tab plus 2–3 junk tabs that popped up.
+3. Same scenario with extension enabled — only the original tab remains.
+
+**AI prompt**
+```
+Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
+24-bit PNG (no alpha), pure white background.
+
+Top 80 pixels: bilingual header, centered.
+Line 1 (Chinese, bold, ~36pt, #202124): "一键终结弹窗新标签页"
+— highlight "弹窗新标签页" in bright blue #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "One Toggle, No More Popup Tabs"
+— highlight "Popup Tabs" in #1A73E8.
+
+Main area (below the header): the two attached screenshots stacked
+vertically with 24px gap. Both depict a browser tab strip.
+- Top image (label "默认 · Default") — tab strip with one real tab and
+  three unrelated popup tabs beside it. Add a small red pill badge:
+  "Default" (background #FEE4E2, text #B42318, 6px radius).
+- Bottom image (label "Popup Tab Guard on") — only one clean tab.
+  Green pill: "Protected" (background #D1FADF, text #027A48).
+
+Round image corners to 12px, soft drop shadow.
+
+Bottom 40 pixels: thin horizontal line #E8EAED, centered extension icon
+and the text "Popup Tab Guard" in #202124 medium 14pt.
+
+Chinese font: PingFang SC / Source Han Sans.
+English font: Inter / SF Pro Display.
+Generous whitespace, Material Design feel.
+```
+
+### #2 — The popup UI (Liquid Glass)
+
+**Capture**
+1. Click the toolbar icon so the extension popup opens.
+2. Screenshot the popup — switch ON state, then OFF state, on a light macOS background (Big Sur / Sonoma wallpaper).
+
+**AI prompt**
+```
+Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
+24-bit PNG (no alpha), pure white background.
+
+Top 80 pixels: bilingual header.
+Line 1 (Chinese, bold, ~36pt, #202124): "极简控制，一开一关"
+— highlight "一开一关" in bright blue #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "Minimal Control, One Switch"
+— highlight "One Switch" in #1A73E8.
+
+Main area: two attached screenshots of the extension popup placed side
+by side with a 48px gap. Left: switch ON (green). Right: switch OFF
+(gray). Round corners 12px, large soft drop shadow to emphasize the
+glass material. Scale to fit the area with comfortable margins.
+
+Under each screenshot, a small label in #5F6368 14pt:
+- Left: "保护开启 · Protection On"
+- Right: "临时关闭 · Paused"
+
+Bottom 40 pixels: extension icon + "Popup Tab Guard" #202124 14pt.
+Follow Material Design, generous whitespace.
+```
+
+### #3 — Scope transparency
+
+**Capture**
+A list-style graphic showing the exact hosts the extension touches and
+the explicit "nothing else" guarantee. No real screenshot needed — text
+composition only.
+
+**AI prompt**
+```
+Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
+24-bit PNG (no alpha), pure white background.
+
+Top 80 pixels: bilingual header.
+Line 1 (Chinese, bold, ~36pt, #202124): "只在这些站点工作，其他一律不动"
+— highlight "只在这些站点" and "一律不动" in #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "Active on Listed Sites — Inactive Everywhere Else"
+— highlight "Active" and "Inactive" in #1A73E8.
+
+Main area: two columns.
+
+Left column header (~20pt, #202124, bold): "生效域名 · Active hosts"
+Below it, a vertical stack of five pill rows (background #E8F0FE, text
+#1A73E8 medium 16pt, 8px radius, 12px vertical padding):
+- missav.com
+- missav.ws
+- missav.ai
+- missav.tv
+- missav123.com
+
+Right column header (~20pt, #202124, bold): "不做什么 · What it won't do"
+Below it, a vertical stack of bullet rows (grey checkmark icon + text
+#5F6368 medium 16pt):
+- 不读取页面文字 · Does not read page text
+- 不访问网络 · Makes no network requests
+- 不收集数据 · Collects no data
+- 不在其他网站运行 · Inactive on all other sites
+
+Bottom 40 pixels: extension icon + "Popup Tab Guard".
+Follow Material Design, airy layout, large whitespace.
+```
+
+### #4 — Open-source & local (trust tile)
+
+**AI prompt**
+```
+Create a Chrome Web Store screenshot, canvas exactly 1280×800 pixels,
+24-bit PNG (no alpha), pure white background.
+
+Top 80 pixels: bilingual header.
+Line 1 (Chinese, bold, ~36pt, #202124): "开源 · 纯本地 · 零上传"
+— highlight "开源", "纯本地", "零上传" in #1A73E8.
+Line 2 (English, medium, ~22pt, #5F6368): "Open Source · Local-Only · Zero Uploads"
+— highlight each of "Open Source", "Local-Only", "Zero Uploads" in #1A73E8.
+
+Main area: three large square icon tiles in a horizontal row, each
+roughly 260×260px, rounded 24px, very soft drop shadow, subtle gradient
+background from #F8FAFF to #FFFFFF.
+
+Tile 1 icon: a stylized code bracket "{ }" in #1A73E8.
+  Label below: "开源 Open Source — 代码在 GitHub 公开"
+Tile 2 icon: a simple house / folder icon in #1A73E8.
+  Label below: "纯本地 Local-Only — 设置只存在你的设备上"
+Tile 3 icon: a cloud with a slash through it, in #1A73E8.
+  Label below: "零上传 Zero Uploads — 无任何网络请求"
+
+Labels: 15pt medium #202124 Chinese / #5F6368 English subtitle underneath.
+
+Bottom 40 pixels: extension icon + "Popup Tab Guard".
+Material Design, ample whitespace.
+```
+
+### #5 — Optional: before/after player click (skip if hard to stage without showing site content)
+
+Skip unless you can get a capture that visibly conveys the popup storm
+without displaying any explicit site content. If shown, blur/block any
+thumbnail imagery from the source site — Chrome reviewers reject
+listings whose screenshots show adult content, even incidentally.
+
+---
+
+## 7. Promo Tiles
+
+### 7.1 Small Promo Tile (440×280)
+
+**AI prompt**
+```
+A Chrome Web Store small promo tile, canvas size 440×280 pixels, 24-bit
+PNG (no alpha). Pure white background decorated with soft blue flowing
+curves in the top-left and bottom-right corners (gradient from deep
+blue #1A73E8 to light blue #4FC3F7).
+
+Center, horizontally stacked text:
+
+Line 1 (Chinese headline, largest, bold): "拦截弹窗新标签页"
+— dark gray #202124 bold sans-serif, with "弹窗新标签页" in bright blue #1A73E8.
+
+Line 2 (English headline, slightly smaller, bold): "Block Rogue Popup Tabs"
+— dark gray #202124 bold sans-serif, with "Popup Tabs" in #1A73E8.
+
+(Spacing ~20px, then)
+
+Line 3 (Chinese subtitle, medium): "点击不再跳出无关标签页"
+— medium gray #5F6368 medium weight.
+
+Line 4 (English subtitle, medium): "Keep your clicks on the page"
+— medium gray #5F6368 medium weight.
+
+Chinese font: PingFang SC Bold / Source Han Sans Heavy.
+English font: Inter Bold / SF Pro Display Bold.
+Rounded canvas corners ~12px. Clean, bright, generous whitespace.
+```
+
+### 7.2 Marquee Promo Tile (1400×560)
+
+**AI prompt**
+```
+A Chrome Web Store Marquee Promo Tile, canvas size 1400×560 pixels,
+24-bit PNG (no alpha channel). Solid pure white background with large
+flowing blue abstract curves in the top-left and bottom-right corners
+(gradient from deep blue #1A73E8 to light blue #4FC3F7), spacious and
+dynamic.
+
+Horizontally-centered vertical text stack:
+
+Line 1 (Chinese headline, largest, bold): "一键终结弹窗新标签页"
+— dark gray #202124 bold sans-serif, with "弹窗新标签页" in bright blue #1A73E8.
+
+Line 2 (English headline, slightly smaller): "One Toggle to End Rogue Popup Tabs"
+— dark gray #202124 bold sans-serif, with "Rogue Popup Tabs" in #1A73E8.
+
+(Spacing 40–60px, then)
+
+Line 3 (Chinese subtitle, medium): "点击停留当前页 · 开源 · 纯本地"
+— medium gray #5F6368 medium weight, with "开源" and "纯本地" in #1A73E8.
+
+Line 4 (English subtitle, medium): "Clicks stay on the page · Open Source · Local-Only"
+— medium gray #5F6368 medium weight, with "Open Source" and "Local-Only" in #1A73E8.
+
+Chinese font: PingFang SC Bold / Source Han Sans Heavy.
+English font: Inter Bold / SF Pro Display Bold.
+Rounded canvas corners ~16px. Clean, modern, Material Design feel.
+```
+
+---
+
+## 8. Packaging
+
+Run from repo root. Zip must contain **only runtime files**:
+
+```bash
+cd /Users/toyz/Documents/Growth/Package/Project/PopupTabGuard
+find . -name ".DS_Store" -delete
+rm -f popup-tab-guard-v*.zip
+VERSION=$(grep '"version"' manifest.json | head -1 | sed 's/[^0-9.]//g')
+zip -r "popup-tab-guard-v${VERSION}.zip" \
+  manifest.json \
+  src/background.js src/content-bridge.js src/content.js \
+  src/popup.html src/popup.css src/popup.js \
+  icons/icon16.png icons/icon32.png icons/icon48.png icons/icon128.png
+```
+
+Verify contents:
+```bash
+unzip -l "popup-tab-guard-v${VERSION}.zip"
+```
+
+Expected: 10 entries, ~20 KB total. If anything else appears (`.git/`,
+`.DS_Store`, `README.md`, `CHROME_STORE.md`, `PRIVACY.md`) remove it and
+re-run — never `zip -r *` or `zip -r . src icons manifest.json`.
+
+---
+
+## 9. Other Listing Fields
+
+| Field | Value |
+|---|---|
+| Category | Productivity |
+| Support site | `https://github.com/Toyzcool/PopupTabGuard/issues` |
+| Homepage | `https://github.com/Toyzcool/PopupTabGuard` |
+| Languages | Default: English. Add Chinese (zh_CN) after first approval unlocks it. |
+
+---
+
+## 10. Post-Submit Notes
+
+- Host permissions on a site Google may flag as adult-adjacent → expect **7–14 business days** of review, possibly longer, possibly a manual-review ping asking for clarification. Keep the single-purpose justification (§3) and privacy policy (§5) ready to paste verbatim into a reply.
+- Most likely rejection reasons for this extension:
+  1. **Screenshot shows site content** that the reviewer considers adult. Mitigation: §6 screenshots are designed to show tab strip / popup UI / text tiles only. Do not screenshot the actual video site.
+  2. **Permission justification too vague.** Paste §3 sections verbatim.
+  3. **Single purpose doubts** — reviewer worries the extension does more than claimed. Mitigation: emphasize that host_permissions are limited to a hard-coded list and the extension takes no action elsewhere.
+- Listing-text / screenshot updates re-review in <24h. Code updates run full review.

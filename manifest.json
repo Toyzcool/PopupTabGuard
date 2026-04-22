@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Popup Tab Guard",
   "version": "1.1.0",
-  "description": "Blocks unwanted popup tabs triggered by clicks on adult-oriented streaming sites, so playback stays in the current tab.",
+  "description": "Keeps playback in the current tab by blocking unwanted popup tabs that open when you click on certain video streaming sites.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

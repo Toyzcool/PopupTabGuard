@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Popup Tab Guard",
+  "version": "1.0.0",
+  "description": "Blocks unwanted popup tabs triggered by clicks on adult-oriented streaming sites, so playback stays in the current tab.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["tabs"],
+  "host_permissions": [
+    "*://*.missav.com/*",
+    "*://*.missav.ws/*",
+    "*://*.missav.ai/*",
+    "*://*.missav.tv/*",
+    "*://*.missav123.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.missav.com/*",
+        "*://*.missav.ws/*",
+        "*://*.missav.ai/*",
+        "*://*.missav.tv/*",
+        "*://*.missav123.com/*"
+      ],
+      "js": ["src/content.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "MAIN"
+    }
+  ]
+}
